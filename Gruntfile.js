@@ -35,6 +35,17 @@ module.exports = function(grunt) {
     },
     clean: {
       css: ["css/dist/*.css", "!css/dist/print.min.css","!css/dist/app.min.css"]
+    },
+    htmlmin: {
+      dist: {                                      // Target
+        options: {                                 // Target options
+          removeComments: true,
+          collapseWhitespace: true
+        },
+        files: {                                   // Dictionary of files
+          'index.html': 'index-dev.html'     // 'destination': 'source'
+        }
+      }
     }
   });
 
@@ -43,9 +54,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-htmlmin');
+
 
   // Default task(s).
-  grunt.registerTask('default', ['uglify','cssmin','concat','clean']);
+  grunt.registerTask('default', ['uglify','cssmin','concat','clean','htmlmin']);
   grunt.registerTask('build', ['uglify','cssmin','concat','clean']);
 
 };
