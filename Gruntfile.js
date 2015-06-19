@@ -4,9 +4,15 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     uglify: {
-      build: {
-        src: 'js/perfmatters.js',
-        dest: 'js/dist/perfmatters.min.js'
+      js: {
+        files: {
+          'js/dist/perfmatters.min.js':'js/perfmatters.js'
+        }
+      },
+      views_js: {
+        files: {
+          'views/dist/js/main.min.js':'views/js/main.js'
+        }
       }
     },
     cssmin: {
@@ -22,19 +28,41 @@ module.exports = function(grunt) {
           dest: 'css/dist',
           ext: '.min.css'
         }]
+      },
+      views_css: {
+        files: {
+          'views/dist/css/pizza.min.css': ['views/css/style.css','views/css/bootstrap-grid.css']
+        }
       }
     },
     concat: {
       options: {
         separator: ';',
       },
-      dist: {
+      app_css: {
         src: ['css/dist/style.min.css','css/dist/google*.css'],
         dest: 'css/dist/app.min.css',
       }
     },
     clean: {
-      css: ["css/dist/*.css", "!css/dist/print.min.css","!css/dist/app.min.css"]
+      build: {
+        src: ["build/*", "build/"]
+      },
+      css: {
+        src: ["css/dist/*", "css/dist"]
+      },
+      html: {
+        src: ["dist/*","dist/"]
+      },
+      js: {
+        src: ["js/dist/*", "js/dist"]
+      },
+      views: {
+        src: ["views/dist/*", "views/dist"]
+      },
+      pre_build_clean_css: {
+        src: ["css/dist/style.min.css","css/dist/google-font-open-sans.min.css"]
+      }
     },
     htmlmin: {
       dist: {                                      // Target
@@ -42,9 +70,35 @@ module.exports = function(grunt) {
           removeComments: true,
           collapseWhitespace: true
         },
-        files: {                                   // Dictionary of files
-          'index.html': 'index-dev.html'     // 'destination': 'source'
+        files: {
+          'dist/index.html': 'index.html',
+          'dist/project-2048.html': 'project-2048.html',
+          'dist/project-mobile.html': 'project-mobile.html',
+          'dist/project-webperf.html': 'project-webperf.html',
+          'views/dist/pizza.html':'views/pizza.html'
         }
+      }
+    },
+    copy: {
+      css: {
+        files:[
+          {expand:true, flatten:true, src:['css/dist/*.css'], dest:'build/css', filter:'isFile'}
+        ]
+      },
+      js: {
+        files:[
+          {expand:true, flatten:true, src:['js/dist/*.js'], dest:'build/js', filter:'isFile'}
+        ]
+      },
+      html: {
+        files:[
+          {expand:true, flatten:true, src:['dist/*.html'], dest:'build/', filter:'isFile'}
+        ]
+      },
+      views: {
+        files:[
+          {expand: true, cwd: 'views/dist/', src: ['**'], dest: 'build/views/'}
+        ]
       }
     }
   });
@@ -55,10 +109,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
 
   // Default task(s).
   grunt.registerTask('default', ['uglify','cssmin','concat','clean','htmlmin']);
   grunt.registerTask('build', ['uglify','cssmin','concat','clean']);
+  grunt.registerTask('build-copy', ['clean','cssmin','concat','clean:pre_build_clean_css',
+    'uglify','htmlmin','copy','clean:css','clean:html','clean:js','clean:views']);//['copy']
+
 
 };
