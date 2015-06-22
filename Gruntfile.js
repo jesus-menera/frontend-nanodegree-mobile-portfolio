@@ -221,8 +221,7 @@ module.exports = function(grunt) {
 
   // Default task(s).
   grunt.registerTask('default', ['uglify','cssmin','concat','clean','htmlmin']);
-  grunt.registerTask('build', ['uglify','cssmin','concat','clean']);
-  grunt.registerTask('build-copy', ['clean','cssmin','concat','clean:pre_build_clean_css',
+  grunt.registerTask('build', ['clean','cssmin','concat','clean:pre_build_clean_css',
     'uglify','imagemin','htmlmin','copy','clean:css','clean:html','clean:js','clean:views','clean:img','clean:views_img']);//['copy']
 
 
