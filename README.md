@@ -73,13 +73,19 @@ index.html:
     2.Moved perfmatters.min.js to the end of the page.
     3.Made resource call for "print.min.css" Async.
   Minified resources.
-    1.Combiened all essential style sheets into one - style.css + google font resource.
+    1.Combiened all essential style sheets into one (style.css + google font resource =  app.min.css).
       * Less calls for render blocking resources leads to faster loads.
     2.Used grunt htmlmin to minify:
       index.html -> index.min.html
       *Less bytes to transmits = Less transmission time -> Faster loads.
 img/*:
-  1.Used grunt
+  1.Used grunt imagemin to minify.
+    cam_be_like.jpg
+    mobilewebdev.jpg
+    profilepic.jpg
+    views/images/pizza.png
+
+    *Issue with views/images/pizzeria.jpg. Minification provided by google pagespeed. grunt imagemin call would invoke "EPIPE error". Working to find reason. Too large, maybe?
 
 ###How to build Optimized Project
 
