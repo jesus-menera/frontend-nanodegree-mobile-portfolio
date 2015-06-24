@@ -53,16 +53,18 @@ You might find the FPS Counter/HUD Display useful in Chrome developer tools desc
 While using [gruntjs](http://gruntjs.com/) utils:
 
 css/*.css:
-  1.Added "google-font-open-sans.css". From google font file referenced in index.html. One less server call
-    for a render-blocking resource.
-  2.Used grunt-cssmin to minified:
-    style.css -> style.min.css
-    google-font-open-sands.css -> google-font-open-sands.min.css
-    print.css -> print.min.css
-      *Less bytes to transmits = Less transmission time.
-  3.Used: grunt-concat to combien:
-    style.min.css + google-font-open-sands.min.css -> app.min.css
-
+  *1.Added "google-font-open-sans.css". From google font file referenced in index.html. One less server callfor a render-blocking resource.
+  *2.Used grunt-cssmin to minified:
+  ```
+  style.css -> style.min.css
+  google-font-open-sands.css -> google-font-open-sands.min.css
+  print.css -> print.min.css
+    *Less bytes to transmits = Less transmission time.
+  ```
+  *3.Used: grunt-concat to combien:
+  ```
+  style.min.css + google-font-open-sands.min.css -> app.min.css
+  ```
 js/perfmatters.js:
   1.Used grunt-cssmin to minify:
     perfmatters.js -> perfmatters.min.js
