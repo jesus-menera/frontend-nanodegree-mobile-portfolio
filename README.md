@@ -87,6 +87,11 @@ img/*:
 
     *Issue with views/images/pizzeria.jpg. Minification provided by google pagespeed. grunt imagemin call would invoke "EPIPE error". Working to find reason. Too large, maybe?
 
+views/js/main.js:
+  1.Used getElementsByClassName instead of querySelectorAll, to search for 'mover' DOM elements.
+  2.Saved a referenced to 'movers', instead of searching for them in every frame.
+  3.Reduced sine calculations from 200 to 5 unique values.
+
 ###How to build Optimized Project
 
 To build:

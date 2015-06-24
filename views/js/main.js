@@ -2,13 +2,13 @@ var moversDivs;
 var visibleMovers;
 var lastWindowScreenHeight;
 
-/**
- * Initializes moversDivs to all divs with class mover, updated visibleMovers
- * to include only divs with style top valued to Window.innerHeight or less.
- * It updates visibleMovers only if Window.innerHeight has changed.
- *
- * @return      visibleMovers
- */
+/*
+  * Initializes moversDivs to all divs with class mover, updated visibleMovers
+  * to include only divs with style top valued to Window.innerHeight or less.
+  * It updates visibleMovers only if Window.innerHeight has changed.
+  *
+  * @return      visibleMovers
+*/
 function getMovers() {
   if (moversDivs === undefined) {
     moversDivs = document.getElementsByClassName('mover');//document.querySelectorAll('.mover')
@@ -34,6 +34,13 @@ function getMovers() {
 /**/
 
 var phases = new Array(5);
+/*
+  * TODO: Use Worker api to calculate phases independently from main thread. Use scrollTop
+  * as key in hash that saves already calculated phases for a given scrollTop value, and near
+  * future values of scrollTop
+  *
+  * @returns phases
+*/
 function calculatePhases(top) {
   for (var i = 0; i < 5; i++) {
      phases[i] = (Math.sin((top / 1250) + (i % 5)));
@@ -574,7 +581,17 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
+  /*
+    Instead of searching the DOM for 'movers' in every call of updatePositions,
+    save a reference to those elements. Update those 'mover' elements only if there is a
+    change in screen size, and limit that update by binding it to a resize call.
+  */
   var items = visibleMovers;
+
+  /*
+    calculate only the 5 unique sine values for 'mover' elements. In previous
+    method of calculattion would a repeat calculations, not very efficient.
+  */
   var pizzaPhases = calculatePhases(window.document.body.scrollTop);
 
   for (var i = 0; i < items.length; i++) {
@@ -593,6 +610,7 @@ function updatePositions() {
 
 // runs updatePositions on scroll
 window.addEventListener('scroll', updatePositions);
+// runs getMovers on resize
 window.addEventListener('resize', getMovers, false);
 
 // Generates the sliding pizzas when the page loads.
