@@ -50,7 +50,7 @@ You might find the FPS Counter/HUD Display useful in Chrome developer tools desc
 
 ###Optimized Steps Taken
 
-While using [gruntjs](http://gruntjs.com/) utils:
+####While using [gruntjs](http://gruntjs.com/) utils:
 
 css/*.css:
   *1.Added "google-font-open-sans.css". From google font file referenced in index.html. One less server callfor a render-blocking resource.
@@ -67,32 +67,65 @@ css/*.css:
   ```
 js/perfmatters.js:
   1.Used grunt-cssmin to minify:
-    perfmatters.js -> perfmatters.min.js
 
-index.html:
-  Moved render blocking reseource.
-    1.Moved Google Analytics script to the end of the page.
-    2.Moved perfmatters.min.js to the end of the page.
-    3.Made resource call for "print.min.css" Async.
-  Minified resources.
+#####css/*.css:
+  * Added "google-font-open-sans.css". From google font file referenced in index.html. One less server call for a render-blocking resource.
+  * Used grunt-cssmin to minified:
+
+  ```
+    style.css -> style.min.css
+    google-font-open-sands.css -> google-font-open-sands.min.css
+    print.css -> print.min.css
+
+    Less bytes to transmits = Less transmission time.
+  ```
+  * Used: grunt-concat to combine:
+
+  ```
+    style.min.css + google-font-open-sands.min.css -> app.min.css
+  ```
+
+#####js/perfmatters.js:
+  * Used grunt-cssmin to minify:
+
+  ```
+    perfmatters.js -> perfmatters.min.js
+  ```
+
+#####index.html:
+  * Moved render blocking resource.
+
+  ```
+    * Moved Google Analytics script to the end of the page.
+    * Moved perfmatters.min.js to the end of the page.
+    * Made resource call for "print.min.css" Async.
+  ```
+
+  * Minified resources.
+  ```
     1.Combiened all essential style sheets into one (style.css + google font resource =  app.min.css).
       * Less calls for render blocking resources leads to faster loads.
     2.Used grunt htmlmin to minify:
       index.html -> index.min.html
       *Less bytes to transmits = Less transmission time -> Faster loads.
-img/*:
-  1.Used grunt imagemin to minify.
+  ```
+
+######img/*:
+  * Used grunt imagemin to minify.
+
+  ```
     cam_be_like.jpg
     mobilewebdev.jpg
     profilepic.jpg
     views/images/pizza.png
 
     *Issue with views/images/pizzeria.jpg. Minification provided by google pagespeed. grunt imagemin call would invoke "EPIPE error". Working to find reason. Too large, maybe?
+  ```
 
-views/js/main.js:
-  1.Used getElementsByClassName instead of querySelectorAll, to search for 'mover' DOM elements.
-  2.Saved a referenced to 'movers', instead of searching for them in every frame.
-  3.Reduced sine calculations from 200 to 5 unique values.
+#####views/js/main.js:
+  * Used getElementsByClassName instead of querySelectorAll, to search for 'mover' DOM elements.
+  * Saved a referenced to 'movers', instead of searching for them in every frame.
+  * Reduced sine calculations from 200 to 5 unique values.
 
 ###How to build Optimized Project
 
