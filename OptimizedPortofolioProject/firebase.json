@@ -1,9 +1,0 @@
-{
-  "firebase": "jmenera-portfoptmzd",
-  "public": ".",
-  "ignore": [
-    "firebase.json",
-    "**/.*",
-    "**/node_modules/**"
-  ]
-}
