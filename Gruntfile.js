@@ -118,6 +118,11 @@ module.exports = function(grunt) {
         files:[
           {expand: true, cwd: 'views/images/dist/', src: ['**'], dest: 'build/views/images/'}
         ]
+      },
+      non_optimized: {
+        files:[
+          {expand: true, cwd: 'views/images/', src: ['full-pizzeria.jpg'], dest: 'build/views/images/'}
+        ]
       }
     },
     imagemin: {
@@ -182,7 +187,7 @@ module.exports = function(grunt) {
           expand: true,
           // cwd is 'current working directory'
           cwd: 'views/images/',
-          src: ['**/*.jpg'],
+          src: ['**/*.jpg','!full-pizzeria.jpg'],
           // Could also match cwd. i.e. project-directory/img/
           dest: 'views/images/dist/',
           ext: '.jpg'
