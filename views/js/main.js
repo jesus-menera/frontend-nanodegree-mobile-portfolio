@@ -1,9 +1,6 @@
-
 var moversDivs;
-var visibleMovers;
-var lastWindowScreenHeight;
 
-/*
+/**
  * Initializes moversDivs to all divs with class mover, updated visibleMovers
  * to include only divs with style top valued to Window.innerHeight or less.
  * It updates visibleMovers only if Window.innerHeight has changed.
@@ -14,69 +11,34 @@ function getMovers() {
     if (moversDivs === undefined) {
         moversDivs = document.getElementsByClassName('mover'); //document.querySelectorAll('.mover')
     }
-    if (visibleMovers === undefined || lastWindowScreenHeight !== window.innerHeight) {
-
-        lastWindowScreenWidth = window.innerHeight;
-        visibleMovers = [];
-        for (var index = 0; index < moversDivs.length; index++) {
-
-            if (parseInt(moversDivs[index].style.top) <= window.innerHeight) {
-                moversDivs[index].style.display = "";
-                visibleMovers.push(moversDivs[index]);
-            } else {
-                moversDivs[index].style.display = "none";
-            }
-        }
-    }
-    return visibleMovers;
+    return moversDivs;
 }
 
-/**/
+var moversCount = 32;//Default value
+function getMoversCount() {
+    /*
+        Example: Screen Size of 900px.
 
-var phases = new Array(5);
-/*
- * TODO: Use Worker api to calculate phases independently from main thread. Use scrollTop
- * as key in hash that saves already calculated phases for a given scrollTop value, and near
- * future values of scrollTop
+    */
+    moversCount = (((window.screen.height - (window.screen.height % 256))  / 256)) * 8;
+    return moversCount;
+}
+
+var randomPizzaContainerDivs;
+
+/**
+ * Initializes moversDivs to all divs with class mover, updated visibleMovers
+ * to include only divs with style top valued to Window.innerHeight or less.
+ * It updates visibleMovers only if Window.innerHeight has changed.
  *
- * @returns phases
+ * @return      visibleMovers
  */
-function calculatePhases(top) {
-    for (var i = 0; i < 5; i++) {
-        phases[i] = (Math.sin((top / 1250) + (i % 5)));
+function getRandomPizzaContainerDivs() {
+    if (randomPizzaContainerDivs === undefined) {
+        randomPizzaContainerDivs = document.getElementsByClassName('randomPizzaContainer'); //document.querySelectorAll('.mover')
     }
-    return phases;
+    return randomPizzaContainerDivs;
 }
-
-function getPhases() {
-    return phases;
-}
-
-
-/*
-var appInit = true;
-var lastScrollTop = -1;
-
-function pizzaRenderLoop() {
-  var top = window.document.body.scrollTop;
-  if (appInit === true) {
-    lastScrollTop = top;
-    calculatePhases(top);
-    appInit = false;
-  }
-
-  if (lastScrollTop !== top) {
-    calculatePhases(top);
-    lastScrollTop = top;
-  }
-  window.requestAnimationFrame(pizzaRenderLoop);
-}
-
-
-window.requestAnimationFrame(pizzaRenderLoop);
-*/
-
-
 
 /*l
 Welcome to the 60fps project! Your goal is to make Cam's Pizzeria website run
@@ -551,10 +513,11 @@ var resizePizzas = function(size) {
 
     // Iterates through pizza elements on the page and changes their widths
     function changePizzaSizes(size) {
-        for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-            var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-            var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-            document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+        var pizzaLength = randomPizzaContainerDivs.length;
+        var dx = determineDx(randomPizzaContainerDivs[0], size);
+        var newwidth = (randomPizzaContainerDivs[0].offsetWidth + dx) + 'px';
+        for (var i = 0; i < pizzaLength; i++) {
+            randomPizzaContainerDivs[i].style.width = newwidth;
         }
     }
 
@@ -595,6 +558,23 @@ function logAverageFrame(times) { // times is the array of User Timing measureme
     console.log("Average time to generate last 10 frames: " + sum / 10 + "ms");
 }
 
+/**/
+
+var phases = new Array(5);
+/*
+ * TODO: Use Worker api to calculate phases independently from main thread. Use scrollTop
+ * as key in hash that saves already calculated phases for a given scrollTop value, and near
+ * future values of scrollTop
+ *
+ * @returns phases
+ */
+function calculatePhases(top) {
+    for (var i = 0; i < 5; i++) {
+        phases[i] = (Math.sin((top / 1250) + (i % 5)));
+    }
+    return phases;
+}
+
 // The following code for sliding background pizzas was pulled from Ilya's demo found at:
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
@@ -604,20 +584,21 @@ function updatePositions() {
     window.performance.mark("mark_start_frame");
 
     /*
+      moversDivs:
+
       Instead of searching the DOM for 'movers' in every call of updatePositions,
       save a reference to those elements. Update those 'mover' elements only if there is a
       change in screen size, and limit that update by binding it to a resize call.
     */
-    var items = visibleMovers;
 
     /*
       calculate only the 5 unique sine values for 'mover' elements. In previous
       method of calculattion would a repeat calculations, not very efficient.
     */
-    var pizzaPhases = calculatePhases(window.document.body.scrollTop);
+    calculatePhases(window.document.body.scrollTop);
 
-    for (var i = 0; i < items.length; i++) {
-        items[i].style.left = items[i].basicLeft + 100 * pizzaPhases[i % 5] + 'px';
+    for (var i = 0; i < moversCount; i++) {
+        moversDivs[i].style.left = moversDivs[i].basicLeft + 100 * phases[i % 5] + 'px';
     }
 
     // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -632,14 +613,43 @@ function updatePositions() {
 
 // runs updatePositions on scroll
 window.addEventListener('scroll', updatePositions);
-// runs getMovers on resize
-window.addEventListener('resize', getMovers, false);
+
+// runs getVisibleMovers on resize
+
+/*
+* Credit:
+* http://stackoverflow.com/questions/5489946/jquery-how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-ac
+
+
+var rtime = new Date(1, 1, 2000, 12, 0, 0);
+var timeout = false;
+var delta = 200;
+
+function resizeend() {
+    if (new Date() - rtime < delta) {
+        setTimeout(resizeend, delta);
+    } else {
+        timeout = false;
+        getVisibleMovers();
+    }
+}
+
+window.onresize = function() {
+    rtime = new Date();
+    if (timeout === false) {
+        timeout = true;
+        setTimeout(resizeend, delta);
+    }
+}
+*/
+/**/
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
     var cols = 8;
     var s = 256;
-    for (var i = 0; i < 200; i++) {
+    getMoversCount();
+    for (var i = 0; i < moversCount; i++) {
         var elem = document.createElement('img');
         elem.className = 'mover';
         elem.src = "images/pizza.png";
@@ -650,5 +660,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector("#movingPizzas1").appendChild(elem);
     }
     getMovers();
+    getRandomPizzaContainerDivs();
     updatePositions();
 });
