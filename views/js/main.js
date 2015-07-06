@@ -570,7 +570,7 @@ var phases = new Array(5);
  */
 function calculatePhases(top) {
     for (var i = 0; i < 5; i++) {
-        phases[i] = (Math.sin((top / 1250) + (i % 5)));
+        phases[i] = 100 * (Math.sin((top / 1250) + (i % 5)));
     }
     return phases;
 }
@@ -598,7 +598,7 @@ function updatePositions() {
     calculatePhases(window.document.body.scrollTop);
 
     for (var i = 0; i < moversCount; i++) {
-        moversDivs[i].style.left = moversDivs[i].basicLeft + 100 * phases[i % 5] + 'px';
+        moversDivs[i].style.transform = "translate(" + phases[i % 5] + "px,0px)" ;
     }
 
     // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -614,36 +614,6 @@ function updatePositions() {
 // runs updatePositions on scroll
 window.addEventListener('scroll', updatePositions);
 
-// runs getVisibleMovers on resize
-
-/*
-* Credit:
-* http://stackoverflow.com/questions/5489946/jquery-how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-ac
-
-
-var rtime = new Date(1, 1, 2000, 12, 0, 0);
-var timeout = false;
-var delta = 200;
-
-function resizeend() {
-    if (new Date() - rtime < delta) {
-        setTimeout(resizeend, delta);
-    } else {
-        timeout = false;
-        getVisibleMovers();
-    }
-}
-
-window.onresize = function() {
-    rtime = new Date();
-    if (timeout === false) {
-        timeout = true;
-        setTimeout(resizeend, delta);
-    }
-}
-*/
-/**/
-
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
     var cols = 8;
@@ -655,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function() {
         elem.src = "images/pizza.png";
         elem.style.height = "100px";
         elem.style.width = "73.333px";
-        elem.basicLeft = (i % cols) * s;
+        elem.style.left = (i % cols) * s+"px"; //Starting point for the css translating function
         elem.style.top = (Math.floor(i / cols) * s) + 'px';
         document.querySelector("#movingPizzas1").appendChild(elem);
     }
