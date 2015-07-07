@@ -99,6 +99,7 @@ js/perfmatters.js:
     * Moved Google Analytics script to the end of the page.
     * Moved perfmatters.min.js to the end of the page.
     * Made resource call for "print.min.css" Async.
+    * Made resource call for "js/perfmatters.min.js" Async.
   ```
 
   * Minified resources.
@@ -131,6 +132,8 @@ js/perfmatters.js:
 
 To build:
  ```
+Personal Setup: OS X Yosemite
+
  $> npm install
  $> grunt build
 
