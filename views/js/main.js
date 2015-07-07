@@ -1,11 +1,10 @@
+
 var moversDivs;
 
 /**
- * Initializes moversDivs to all divs with class mover, updated visibleMovers
- * to include only divs with style top valued to Window.innerHeight or less.
- * It updates visibleMovers only if Window.innerHeight has changed.
+ * Caches all divs with class 'mover.'
  *
- * @return      visibleMovers
+ * @return      moversMovers
  */
 function getMovers() {
     if (moversDivs === undefined) {
@@ -14,28 +13,36 @@ function getMovers() {
     return moversDivs;
 }
 
-var moversCount = 32;//Default value
+var moversCount = 32; //Default value
+
+/**
+ * Calculates moversCount based on screen height and caches result.
+ *
+ * @return moversCount
+ */
 function getMoversCount() {
     /*
         Example: Screen Size of 900px.
-
+        900 - (132) = 768
+        758 / 256 = 3 pizzas rows.
+        3 * 8 = 24 pizzas.
+        24 pizzas needed for a 900px screen.
     */
-    moversCount = (((window.screen.height - (window.screen.height % 256))  / 256)) * 8;
+    moversCount = (((window.screen.height - (window.screen.height % 256)) / 256)) * 8;
     return moversCount;
 }
 
 var randomPizzaContainerDivs;
 
 /**
- * Initializes moversDivs to all divs with class mover, updated visibleMovers
- * to include only divs with style top valued to Window.innerHeight or less.
- * It updates visibleMovers only if Window.innerHeight has changed.
+ * Caches all divs with class 'randomPizzaContainer.'
  *
- * @return      visibleMovers
+ * @return      randomPizzaContainer
  */
+
 function getRandomPizzaContainerDivs() {
     if (randomPizzaContainerDivs === undefined) {
-        randomPizzaContainerDivs = document.getElementsByClassName('randomPizzaContainer'); //document.querySelectorAll('.mover')
+        randomPizzaContainerDivs = document.getElementsByClassName('randomPizzaContainer');
     }
     return randomPizzaContainerDivs;
 }
@@ -511,8 +518,13 @@ var resizePizzas = function(size) {
         return dx;
     }
 
-    // Iterates through pizza elements on the page and changes their widths
+    /**
+     * Iterates through pizza elements on the page and changes their widths.
+     */
     function changePizzaSizes(size) {
+        // Change from previous version: figure only one width. Since all randomPizzaContainerDivs
+        // share width, there is not need to repeat calculation for every element.
+
         var pizzaLength = randomPizzaContainerDivs.length;
         var dx = determineDx(randomPizzaContainerDivs[0], size);
         var newwidth = (randomPizzaContainerDivs[0].offsetWidth + dx) + 'px';
@@ -561,14 +573,16 @@ function logAverageFrame(times) { // times is the array of User Timing measureme
 /**/
 
 var phases = new Array(5);
-/*
- * TODO: Use Worker api to calculate phases independently from main thread. Use scrollTop
- * as key in hash that saves already calculated phases for a given scrollTop value, and near
- * future values of scrollTop
- *
- * @returns phases
+
+/** Returns array of sine values.
+ * @param {integer} top
+ * @return phases
  */
 function calculatePhases(top) {
+    /* TODO: Use Worker api to calculate phases independently from main thread. Use scrollTop
+     *  as key in hash that saves already calculated phases for a given scrollTop value, and near
+     *  future values of scrollTop
+     */
     for (var i = 0; i < 5; i++) {
         phases[i] = 100 * (Math.sin((top / 1250) + (i % 5)));
     }
@@ -584,21 +598,27 @@ function updatePositions() {
     window.performance.mark("mark_start_frame");
 
     /*
-      moversDivs:
+        moversDivs:
+        Instead of searching the DOM for 'movers' in every call of updatePositions,
+        save a reference to those elements.
 
-      Instead of searching the DOM for 'movers' in every call of updatePositions,
-      save a reference to those elements. Update those 'mover' elements only if there is a
-      change in screen size, and limit that update by binding it to a resize call.
+        phases:
+        calculate only the 5 unique sine values for 'mover' elements. In previous
+        method of calculattion would a repeat calculations, not very efficient.
+
+        transform:
+        applying transforms is cheaper, performance-wise, than applying styles.
+        Made sure pizzas had a starting point from which to translate by setting a 'left' value.
+
+        moversCount:
+        instead of iterating 200 original elements, iterate a smaller number based on screen size.
     */
 
-    /*
-      calculate only the 5 unique sine values for 'mover' elements. In previous
-      method of calculattion would a repeat calculations, not very efficient.
-    */
+
     calculatePhases(window.document.body.scrollTop);
 
     for (var i = 0; i < moversCount; i++) {
-        moversDivs[i].style.transform = "translate(" + phases[i % 5] + "px,0px)" ;
+        moversDivs[i].style.transform = "translate(" + phases[i % 5] + "px,0px)";
     }
 
     // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -618,18 +638,18 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
     var cols = 8;
     var s = 256;
-    getMoversCount();
-    for (var i = 0; i < moversCount; i++) {
+    getMoversCount(); // Figure out how many pizzas are needed based on screen size.
+    for (var i = 0; i < moversCount; i++) { // iterates through smaller number than 200.
         var elem = document.createElement('img');
         elem.className = 'mover';
         elem.src = "images/pizza.png";
         elem.style.height = "100px";
         elem.style.width = "73.333px";
-        elem.style.left = (i % cols) * s+"px"; //Starting point for the css translating function
+        elem.style.left = (i % cols) * s + "px"; // Starting point for the css translating function
         elem.style.top = (Math.floor(i / cols) * s) + 'px';
         document.querySelector("#movingPizzas1").appendChild(elem);
     }
-    getMovers();
-    getRandomPizzaContainerDivs();
+    getMovers(); // Cache movers
+    getRandomPizzaContainerDivs(); // Chache randomPizzaContainers
     updatePositions();
 });
